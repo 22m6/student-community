@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#F4F6FB" />
+<title>同窗 · 校园社区</title>
+<style>
+  :root{
+    --bg:#F4F6FB;
+    --surface:#FFFFFF;
+    --text:#111827;
+    --text-2:#4B5563;
+    --muted:#8A93A6;
+    --line:#EDF0F6;
+    --primary:#4B6BFB;
+    --primary-2:#7B5CFF;
+    --like:#FF4D7D;
+    --warn:#FF9F43;
+    --ok:#22C55E;
+    --radius:20px;
+    --shadow:0 8px 24px rgba(23,32,64,.06);
+    --shadow-lg:0 18px 44px rgba(23,32,64,.13);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:
+      radial-gradient(900px 600px at 15% 10%, #EAF0FF 0%, transparent 60%),
+      radial-gradient(800px 600px at 85% 85%, #F3EBFF 0%, transparent 55%),
+      #E9ECF4;
+    color:var(--text);
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit;padding:0}
+  input,textarea{font-family:inherit}
+
+  /* ---------- 桌面端品牌栏 ---------- */
+  .stage{display:flex;align-items:center;gap:72px;max-width:1180px;width:100%;justify-content:center}
+  .brand{max-width:400px;flex:0 0 400px}
+  .logo-row{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+  .logo{
+    width:54px;height:54px;border-radius:17px;
+    background:linear-gradient(140deg,var(--primary),var(--primary-2));
+    display:grid;place-items:center;color:#fff;font-weight:700;font-size:24px;
+    box-shadow:0 12px 26px rgba(75,107,251,.35);
+    letter-spacing:.5px;
+  }
+  .logo-row small{display:block;color:var(--muted);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+  .brand h1{font-size:38px;line-height:1.22;margin:0 0 14px;letter-spacing:-.02em}
+  .brand h1 em{font-style:normal;background:linear-gradient(120deg,var(--primary),var(--primary-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .brand p{color:var(--text-2);font-size:15px;line-height:1.75;margin:0 0 26px}
+  .feat{display:flex;flex-direction:column;gap:13px;margin-bottom:28px}
+  .feat div{display:flex;align-items:center;gap:11px;font-size:14px;color:var(--text-2)}
+  .feat i{
+    width:26px;height:26px;border-radius:9px;flex:0 0 26px;display:grid;place-items:center;
+    background:#fff;box-shadow:0 3px 10px rgba(23,32,64,.08);font-style:normal;font-size:13px;
+  }
+  .hint{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .hint span{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(34,197,94,.15)}
+
+  /* ---------- 手机外框 ---------- */
+  .phone{
+    width:394px;height:min(846px, calc(100vh - 48px));flex:0 0 auto;
+    background:#0E1220;border-radius:52px;padding:11px;
+    box-shadow:0 40px 90px rgba(16,22,44,.28), 0 4px 12px rgba(16,22,44,.2), inset 0 0 0 1.5px rgba(255,255,255,.1);
+    position:relative;
+  }
+  .screen{
+    position:relative;width:100%;height:100%;background:var(--bg);
+    border-radius:42px;overflow:hidden;display:flex;flex-direction:column;
+  }
+
+  /* 状态栏 */
+  .statusbar{
+    height:46px;flex:0 0 46px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 26px 0 30px;font-size:13.5px;font-weight:600;letter-spacing:.02em;color:var(--text);
+    position:relative;z-index:20;
+  }
+  .sb-right{display:flex;align-items:center;gap:5px}
+  .notch{
+    position:absolute;left:50%;top:9px;transform:translateX(-50%);
+    width:104px;height:26px;background:#0E1220;border-radius:16px;z-index:30;
+  }
+
+  /* 内容滚动区 */
+  .scroll{flex:1;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;padding-bottom:16px}
+  .scroll::-webkit-scrollbar{width:0}
+
+  .page{display:none;animation:pageIn .26s ease}
+  .page.active{display:block}
+  @keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* 顶部导航 */
+  .topbar{
+    position:sticky;top:0;z-index:15;
+    background:rgba(244,246,251,.86);backdrop-filter:saturate(180%) blur(16px);
+    padding:2px 18px 10px;
+  }
+  .topbar-row{display:flex;align-items:center;gap:10px;height:40px}
+  .app-title{font-size:21px;font-weight:800;letter-spacing:-.01em;margin:0;display:flex;align-items:center;gap:7px}
+  .app-title b{background:linear-gradient(130deg,var(--primary),var(--primary-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .icon-btn{
+    width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:var(--text-2);
+    background:rgba(255,255,255,.75);box-shadow:0 2px 8px rgba(23,32,64,.05);transition:.15s;
+  }
+  .icon-btn:active{transform:scale(.93)}
+  .search{
+    flex:1;display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;
+    background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(23,32,64,.06);color:var(--muted);
+  }
+  .search input{border:0;outline:0;background:none;width:100%;font-size:13.5px;color:var(--text)}
+  .search input::placeholder{color:#AAB2C0}
+
+  /* 分段控件 */
+  .seg{display:flex;gap:20px;padding:2px 4px 0;margin-top:6px}
+  .seg button{font-size:14.5px;font-weight:600;color:var(--muted);position:relative;padding:6px 0;transition:.15s}
+  .seg button.on{color:var(--text);font-weight:800}
+  .seg button.on::after{
+    content:'';position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+    width:20px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--primary),var(--primary-2));
+  }
+
+  /* 话题横滑 */
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:12px 18px 4px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex:0 0 auto;font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:999px;
+    background:#fff;color:var(--text-2);box-shadow:0 2px 8px rgba(23,32,64,.05);
+    border:1px solid #F0F2F8;transition:.15s;
+  }
+  .chip.on{background:linear-gradient(130deg,var(--primary),var(--primary-2));color:#fff;border-color:transparent;box-shadow:0 8px 18px rgba(75,107,251,.28)}
+  .chip:active{transform:scale(.96)}
+
+  /* 卡片 */
+  .card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .post{padding:15px 15px 10px;margin:10px 14px}
+  .post-head{display:flex;align-items:center;gap:10px}
+  .avatar{
+    width:42px;height:42px;border-radius:14px;flex:0 0 42px;display:grid;place-items:center;
+    color:#fff;font-weight:700;font-size:16px;
+    background:linear-gradient(140deg,var(--a,#7B8CFF),var(--b,#4B6BFB));
+    box-shadow:0 4px 12px rgba(23,32,64,.14);
+  }
+  .avatar.sm{width:34px;height:34px;flex:0 0 34px;font-size:13px;border-radius:11px}
+  .who{flex:1;min-width:0}
+  .name{font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .badge{font-size:10px;font-weight:700;color:var(--primary);background:#EEF2FF;padding:2px 6px;border-radius:6px;letter-spacing:.02em}
+  .badge.gold{color:#B7791F;background:#FEF6E4}
+  .meta{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .follow-btn{
+    font-size:12px;font-weight:700;color:var(--primary);padding:6px 12px;border-radius:999px;
+    border:1px solid #DCE4FF;background:#F5F7FF;transition:.15s;
+  }
+  .follow-btn.done{color:var(--muted);border-color:#EBEEF5;background:#F7F8FB}
+  .follow-btn:active{transform:scale(.94)}
+
+  .post-text{font-size:14.5px;line-height:1.72;margin:11px 0 0;color:#1F2937;word-break:break-word}
+  .post-text .hl{color:var(--primary);font-weight:600}
+  .topic{display:inline-block;font-size:12.5px;font-weight:600;color:var(--primary);background:#F1F4FF;padding:4px 9px;border-radius:8px;margin-top:9px}
+
+  /* 图片网格 */
+  .media{display:grid;gap:5px;margin-top:11px;border-radius:16px;overflow:hidden}
+  .media.one{grid-template-columns:1fr}
+  .media.two{grid-template-columns:1fr 1fr}
+  .media.four{grid-template-columns:1fr 1fr}
+  .ph{
+    position:relative;display:grid;place-items:center;overflow:hidden;
+    background:linear-gradient(140deg,var(--c1,#CBD5FF),var(--c2,#8FA6FF));
+    aspect-ratio:1/1;
+  }
+  .media.one .ph{aspect-ratio:16/10}
+  .ph::after{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(circle at 28% 18%,rgba(255,255,255,.6),transparent 58%),
+               radial-gradient(circle at 82% 92%,rgba(255,255,255,.28),transparent 52%);
+  }
+  .ph span{position:relative;z-index:1;font-size:34px;filter:drop-shadow(0 6px 10px rgba(23,32,64,.18))}
+  .ph.more::before{
+    content:attr(data-more);position:absolute;inset:0;z-index:2;
+    background:rgba(17,24,39,.45);color:#fff;font-size:15px;font-weight:700;
+    display:grid;place-items:center;backdrop-filter:blur(2px);
+  }
+
+  /* 操作栏 */
+  .post-actions{display:flex;align-items:center;gap:4px;margin-top:10px;padding-top:9px;border-top:1px solid #F4F6FB}
+  .act{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+    font-size:12.5px;color:var(--muted);padding:7px 0;border-radius:10px;transition:.15s;
+  }
+  .act svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .act:active{background:#F6F8FC;transform:scale(.97)}
+  .act.liked{color:var(--like);font-weight:700}
+  .act.liked svg{fill:var(--like);stroke:var(--like);animation:pop .34s ease}
+  .act.saved{color:var(--warn);font-weight:700}
+  .act.saved svg{fill:var(--warn);stroke:var(--warn);animation:pop .34s ease}
+  @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.32)}100%{transform:scale(1)}}
+
+  /* 发布器 */
+  .composer{margin:12px 14px 4px;padding:12px 14px;display:flex;align-items:center;gap:10px;
+    background:#fff;border-radius:16px;box-shadow:var(--shadow);}
+  .composer .fake{flex:1;font-size:13.5px;color:#A7AEBC}
+  .composer .pen{
+    width:32px;height:32px;border-radius:11px;display:grid;place-items:center;color:#fff;
+    background:linear-gradient(140deg,var(--primary),var(--primary-2));box-shadow:0 6px 14px rgba(75,107,251,.3);
+  }
+
+  /* 发现页 */
+  .section-title{display:flex;align-items:center;justify-content:space-between;margin:20px 18px 10px}
+  .section-title h3{font-size:15.5px;font-weight:800;margin:0;letter-spacing:-.01em}
+  .section-title a{font-size:12px;color:var(--muted);text-decoration:none}
+  .quick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 12px}
+  .quick button{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 2px;border-radius:16px;transition:.15s}
+  .quick button:active{background:#fff;transform:scale(.96)}
+  .qi{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-size:21px;
+    background:#fff;box-shadow:0 4px 14px rgba(23,32,64,.08)}
+  .quick span{font-size:11.5px;color:var(--text-2);font-weight:600}
+
+  .rank{margin:0 14px;padding:6px 4px}
+  .rank-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:14px;transition:.15s}
+  .rank-item:active{background:#F7F9FE}
+  .rank-no{width:20px;font-size:14px;font-weight:800;color:#C2C9D6;text-align:center;font-style:italic}
+  .rank-item:nth-child(1) .rank-no{color:#FF5C5C}
+  .rank-item:nth-child(2) .rank-no{color:#FF9F43}
+  .rank-item:nth-child(3) .rank-no{color:#FFC93C}
+  .rank-body{flex:1;min-width:0}
+  .rank-body b{display:block;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rank-body small{font-size:11px;color:var(--muted)}
+  .heat{font-size:11px;color:#FF7A45;font-weight:700;background:#FFF2EC;padding:3px 7px;border-radius:7px}
+
+  .event{margin:6px 14px 0;padding:14px;display:flex;gap:12px;align-items:center;
+    background:linear-gradient(120deg,#1B2340,#2C3559);border-radius:18px;color:#fff;box-shadow:0 12px 28px rgba(27,35,64,.24)}
+  .event .cover{width:62px;height:62px;border-radius:14px;display:grid;place-items:center;font-size:27px;
+    background:linear-gradient(140deg,#5B7BFF,#9E6BFF);flex:0 0 62px}
+  .event b{font-size:14px;display:block;margin-bottom:5px}
+  .event small{font-size:11.5px;color:#B9C2DC;display:block;line-height:1.6}
+  .event .go{font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.16);color:#fff}
+
+  /* 消息页 */
+  .notice{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 14px}
+  .notice button{background:#fff;border-radius:16px;padding:13px 6px;display:flex;flex-direction:column;align-items:center;gap:7px;
+    box-shadow:var(--shadow);position:relative;transition:.15s}
+  .notice button:active{transform:scale(.96)}
+  .notice .ni{font-size:21px}
+  .notice span{font-size:11.5px;color:var(--text-2);font-weight:600}
+  .dot-badge{position:absolute;top:10px;right:22px;min-width:16px;height:16px;border-radius:8px;background:#FF4D5E;color:#fff;
+    font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px;box-shadow:0 0 0 2px #fff}
+  .chat{display:flex;align-items:center;gap:11px;padding:11px 16px;transition:.15s}
+  .chat:active{background:#F7F9FE}
+  .chat .who b{font-size:14px;font-weight:700}
+  .chat .who p{font-size:12.5px;color:var(--muted);margin:4px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chat .time{font-size:11px;color:#B4BBC8;align-self:flex-start;margin-top:2px}
+  .chat .unread{width:18px;height:18px;border-radius:9px;background:#FF4D5E;color:#fff;font-size:10.5px;font-weight:700;display:grid;place-items:center}
+
+  /* 我的 */
+  .profile-cover{
+    height:132px;background:
+      radial-gradient(400px 180px at 20% 0%, #7B93FF 0%, transparent 65%),
+      radial-gradient(360px 200px at 90% 20%, #A97BFF 0%, transparent 60%),
+      linear-gradient(150deg,#3E55C9,#6E52D8);
+    position:relative;
+  }
+  .profile-cover::after{
+    content:'';position:absolute;inset:0;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23ffffff' fill-opacity='0.18'/%3E%3C/svg%3E");
+  }
+  .profile-card{margin:-38px 14px 0;background:#fff;border-radius:22px;padding:0 16px 16px;box-shadow:var(--shadow-lg);position:relative}
+  .p-avatar{
+    width:74px;height:74px;border-radius:24px;margin-top:-37px;
+    display:grid;place-items:center;font-size:27px;font-weight:800;color:#fff;
+    background:linear-gradient(140deg,#8FA6FF,#5B62E8);
+    box-shadow:0 10px 24px rgba(75,107,251,.36), 0 0 0 4px #fff;
+  }
+  .p-name{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:19px;font-weight:800;letter-spacing:-.01em}
+  .p-bio{font-size:12.5px;color:var(--muted);line-height:1.7;margin:6px 0 0}
+  .p-stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:15px;padding-top:14px;border-top:1px solid #F2F5FA}
+  .p-stats div{text-align:center}
+  .p-stats b{display:block;font-size:16.5px;font-weight:800;letter-spacing:-.01em}
+  .p-stats small{font-size:11px;color:var(--muted)}
+  .p-edit{position:absolute;right:16px;top:16px;font-size:12px;font-weight:700;padding:7px 14px;border-radius:999px;
+    border:1px solid #E4E9F5;color:var(--text-2);background:#fff}
+
+  .menu{margin:12px 14px 0;background:#fff;border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+  .menu-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #F5F7FB;transition:.15s}
+  .menu-row:last-child{border-bottom:0}
+  .menu-row:active{background:#F7F9FE}
+  .menu-row .mi{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font-size:15px;background:#F3F6FD}
+  .menu-row span{flex:1;font-size:14px;font-weight:600}
+  .menu-row .arrow{color:#CBD2DE;font-size:15px}
+
+  /* 底部导航 */
+  .tabbar{
+    position:relative;flex:0 0 auto;display:grid;grid-template-columns:repeat(5,1fr);
+    background:rgba(255,255,255,.94);backdrop-filter:blur(20px);
+    border-top:1px solid #EDF0F6;padding:8px 6px calc(10px + env(safe-area-inset-bottom));
+    z-index:20;
+  }
+  .tab{display:flex;flex-direction:column;align-items:center;gap:4px;color:#A7AEBC;transition:.16s;position:relative;padding-top:2px}
+  .tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round;transition:.16s}
+  .tab span{font-size:10.5px;font-weight:600;letter-spacing:.02em}
+  .tab.on{color:var(--primary)}
+  .tab.on svg{transform:translateY(-1px) scale(1.04)}
+  .tab.on::before{content:'';position:absolute;top:-8px;width:18px;height:3px;border-radius:2px;
+    background:linear-gradient(90deg,var(--primary),var(--primary-2))}
+  .tab-mid{padding-top:0}
+  .tab-mid .plus{
+    width:46px;height:46px;border-radius:16px;display:grid;place-items:center;margin-top:-20px;
+    background:linear-gradient(140deg,var(--primary),var(--primary-2));color:#fff;
+    box-shadow:0 10px 22px rgba(75,107,251,.4);transition:.16s;
+  }
+  .tab-mid .plus:active{transform:scale(.92)}
+  .tab-mid .plus svg{stroke:#fff;width:24px;height:24px;transform:none}
+
+  /* 浮层 sheet */
+  .overlay{
+    position:absolute;inset:0;z-index:40;background:rgba(14,18,32,.42);
+    backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .22s;
+    display:flex;flex-direction:column;justify-content:flex-end;
+  }
+  .overlay.show{opacity:1;pointer-events:auto}
+  .sheet{
+    background:#fff;border-radius:26px 26px 0 0;padding:8px 16px calc(18px + env(safe-area-inset-bottom));
+    transform:translateY(100%);transition:transform .3s cubic-bezier(.22,1,.36,1);
+    max-height:88%;display:flex;flex-direction:column;
+  }
+  .overlay.show .sheet{transform:translateY(0)}
+  .grabber{width:38px;height:4px;border-radius:2px;background:#E3E7EF;margin:6px auto 12px;flex:0 0 auto}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .sheet-head h3{margin:0;font-size:16.5px;font-weight:800}
+  .sheet-head button{font-size:13.5px;color:var(--muted);font-weight:600}
+  .pub-btn{
+    font-size:13.5px;font-weight:700;color:#fff;padding:8px 18px;border-radius:999px;
+    background:linear-gradient(130deg,var(--primary),var(--primary-2));box-shadow:0 6px 16px rgba(75,107,251,.3);
+  }
+  .pub-btn:disabled{opacity:.42;box-shadow:none}
+  .sheet textarea{
+    width:100%;min-height:110px;border:0;outline:0;resize:none;font-size:15px;line-height:1.7;color:var(--text);
+  }
+  .sheet textarea::placeholder{color:#AEB6C4}
+  .pub-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .pub-tools button{font-size:12.5px;font-weight:600;color:var(--text-2);background:#F5F7FC;padding:8px 12px;border-radius:11px;display:flex;align-items:center;gap:5px}
+  .pub-tools button.on{background:#EEF2FF;color:var(--primary)}
+  .img-slots{display:flex;gap:8px;margin-top:12px}
+  .slot{width:64px;height:64px;border-radius:14px;border:1.6px dashed #DDE3EF;display:grid;place-items:center;
+    color:#B9C2D2;font-size:22px;background:#FAFBFE;transition:.15s}
+  .slot:active{transform:scale(.94)}
+  .slot.filled{border:0;background:linear-gradient(140deg,#CBD5FF,#8FA6FF);color:#fff;font-size:24px;position:relative}
+  .slot.filled::after{content:'×';position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;
+    background:#111827;color:#fff;font-size:11px;display:grid;place-items:center}
+
+  .cmt{max-height:250px;overflow-y:auto;padding-right:2px}
+  .cmt-item{display:flex;gap:10px;padding:9px 0}
+  .cmt-item .who b{font-size:13px;font-weight:700}
+  .cmt-item .who p{font-size:13px;line-height:1.6;color:#374151;margin:3px 0 0}
+  .cmt-item .who small{font-size:11px;color:#B0B8C6}
+  .cmt-input{display:flex;gap:9px;align-items:center;margin-top:10px;padding-top:11px;border-top:1px solid #F2F5FA}
+  .cmt-input input{
+    flex:1;height:40px;border-radius:12px;border:1px solid #EDF0F6;background:#F8FAFD;
+    padding:0 13px;font-size:13.5px;outline:0;color:var(--text);
+  }
+  .cmt-input input:focus{border-color:#C9D5FF;background:#fff}
+  .cmt-send{height:40px;padding:0 16px;border-radius:12px;color:#fff;font-size:13px;font-weight:700;
+    background:linear-gradient(130deg,var(--primary),var(--primary-2))}
+
+  .empty{text-align:center;padding:60px 24px;color:var(--muted)}
+  .empty .e{font-size:44px;margin-bottom:12px}
+  .empty p{font-size:13.5px;line-height:1.7;margin:0}
+
+  /* toast */
+  .toast{
+    position:absolute;left:50%;bottom:96px;transform:translate(-50%,14px);
+    background:rgba(17,24,39,.92);color:#fff;font-size:13px;font-weight:600;
+    padding:10px 18px;border-radius:999px;z-index:60;opacity:0;pointer-events:none;
+    transition:.24s;backdrop-filter:blur(8px);white-space:nowrap;max-width:86%;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  .tabbar-hidden{display:none}
+
+  /* 响应式：手机上全屏 */
+  @media (max-width:960px){
+    body{padding:0;display:block;background:var(--bg)}
+    .stage{display:block;max-width:none}
+    .brand{display:none}
+    .phone{width:100%;height:100dvh;height:100vh;padding:0;border-radius:0;box-shadow:none;background:var(--bg)}
+    .screen{border-radius:0}
+    .notch{display:none}
+    .statusbar{height:calc(38px + env(safe-area-inset-top));flex-basis:calc(38px + env(safe-area-inset-top));
+      padding-top:env(safe-area-inset-top)}
+    .toast{bottom:110px}
+  }
+  @media (max-height:720px) and (min-width:961px){
+    .phone{height:calc(100vh - 24px)}
+    body{padding:12px}
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <!-- 桌面端品牌介绍 -->
+  <aside class="brand">
+    <div class="logo-row">
+      <div class="logo">同</div>
+      <div>
+        <strong style="font-size:16px">同窗</strong>
+        <small>Campus Community</small>
+      </div>
+    </div>
+    <h1>把校园里的<em>人和事</em><br/>装进一个圈子</h1>
+    <p>一个面向大学生的轻量社区：发动态、找搭子、逛二手、看热榜。所有交互都可真实点击，数据保存在本地。</p>
+    <div class="feat">
+      <div><i>💬</i>动态信息流，点赞 / 评论 / 收藏 / 关注</div>
+      <div><i>🧭</i>发现页聚合热榜、社团与校园活动</div>
+      <div><i>✍️</i>发布器支持话题标签与配图位</div>
+      <div><i>🏠</i>个人主页含数据统计与常用入口</div>
+    </div>
+    <div class="hint"><span></span>可直接在手机上全屏使用 · 数据本地留存</div>
+  </aside>
+
+  <!-- 手机 -->
+  <div class="phone">
+    <div class="screen">
+      <div class="notch"></div>
+      <div class="statusbar">
+        <div id="clock">9:41</div>
+        <div class="sb-right">
+          <svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="7" width="3" height="4" rx="1" fill="#111827"/><rect x="4.5" y="5" width="3" height="6" rx="1" fill="#111827"/><rect x="9" y="2.5" width="3" height="8.5" rx="1" fill="#111827"/><rect x="13.5" y="0" width="3" height="11" rx="1" fill="#111827"/></svg>
+          <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 9.2 5.9 7.1a3 3 0 0 1 4.2 0L8 9.2Z" fill="#111827"/><path d="M8 4.4c-1.6 0-3.1.6-4.2 1.7L2.4 4.7A8.3 8.3 0 0 1 8 2.4c2.1 0 4.1.8 5.6 2.3l-1.4 1.4A5.9 5.9 0 0 0 8 4.4Z" fill="#111827"/><path d="M8 .2C5 .2 2.3 1.4.2 3.5l1.4 1.4A9.2 9.2 0 0 1 8 2.2c2.4 0 4.7.9 6.4 2.6l1.4-1.4A11.2 11.2 0 0 0 8 .2Z" fill="#111827"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".6" y=".6" width="21" height="10.8" rx="3" stroke="#111827" stroke-opacity=".38" stroke-width="1.1"/><rect x="2.2" y="2.2" width="16" height="7.6" rx="1.8" fill="#111827"/><path d="M23.2 4.2v3.6c.9-.3 1.3-.9 1.3-1.8s-.4-1.5-1.3-1.8Z" fill="#111827" fill-opacity=".5"/></svg>
+        </div>
+      </div>
+
+      <main class="scroll" id="scroll">
+        <!-- ============ 首页 ============ -->
+        <section class="page active" data-page="home">
+          <div class="topbar">
+            <div class="topbar-row">
+              <h1 class="app-title"><b>同窗</b> <span style="font-size:11px;font-weight:700;color:#8A93A6;background:#fff;padding:3px 7px;border-radius:7px;box-shadow:0 2px 8px rgba(23,32,64,.06)">校园版</span></h1>
+              <div style="flex:1"></div>
+              <button class="icon-btn" data-action="toast" data-msg="扫码入圈功能开发中">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 12h8"/></svg>
+              </button>
+              <button class="icon-btn" data-action="toast" data-msg="你有 3 条新通知" style="position:relative">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                <i style="position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:#FF4D5E;box-shadow:0 0 0 2px #fff"></i>
+              </button>
+            </div>
+            <div class="search">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+              <input id="searchInput" placeholder="搜同学、话题、二手好物" />
+            </div>
+            <div class="seg">
+              <button class="on" data-feed="reco">推荐</button>
+              <button data-feed="follow">关注</button>
+              <button data-feed="hot">最新</button>
+            </div>
+          </div>
+
+          <div class="chips" id="chips">
+            <button class="chip on" data-topic="全部">全部</button>
+            <button class="chip" data-topic="期末冲刺">#期末冲刺</button>
+            <button class="chip" data-topic="食堂测评">#食堂测评</button>
+            <button class="chip" data-topic="考研搭子">#考研搭子</button>
+            <button class="chip" data-topic="社团招新">#社团招新</button>
+            <button class="chip" data-topic="二手闲置">#二手闲置</button>
+          </div>
+
+          <div class="composer" data-action="openPub">
+            <div class="avatar sm" style="--a:#FFC48A;--b:#FF8A5B">我</div>
+            <div class="fake">今天校园里发生了什么？</div>
+            <div class="pen">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </div>
+          </div>
+
+          <div id="feedList"></div>
+          <div style="text-align:center;font-size:12px;color:#B4BBC8;padding:18px 0 6px">已经到底啦 · 下拉刷新试试</div>
+        </section>
+
+        <!-- ============ 发现 ============ -->
+        <section class="page" data-page="discover">
+          <div class="topbar">
+            <div class="topbar-row" style="justify-content:space-between">
+              <h1 class="app-title">发现</h1>
+              <button class="icon-btn" data-action="toast" data-msg="筛选条件：本校 · 7 天内">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="quick">
+            <button data-action="toast" data-msg="二手市场 · 128 件在售"><div class="qi">🛋️</div><span>二手市场</span></button>
+            <button data-action="toast" data-msg="学习搭子 · 正在为你匹配"><div class="qi">📚</div><span>学习搭子</span></button>
+            <button data-action="toast" data-msg="失物招领 · 6 条新信息"><div class="qi">🎒</div><span>失物招领</span></button>
+            <button data-action="toast" data-msg="社团招新 · 32 个社团开放"><div class="qi">🎭</div><span>社团招新</span></button>
+            <button data-action="toast" data-msg="组队运动 · 今晚 8 点篮球场"><div class="qi">🏀</div><span>组队运动</span></button>
+            <button data-action="toast" data-msg="表白墙 · 今日 47 条"><div class="qi">💌</div><span>表白墙</span></button>
+            <button data-action="toast" data-msg="求帮忙 · 12 个待解决"><div class="qi">🙋</div><span>求帮忙</span></button>
+            <button data-action="toast" data-msg="食堂测评 · 本周更新 18 条"><div class="qi">🍜</div><span>食堂测评</span></button>
+          </div>
+
+          <div class="section-title">
+            <h3>🔥 校园热榜</h3>
+            <a>完整榜单 ›</a>
+          </div>
+          <div class="card rank">
+            <div class="rank-item" data-action="toast" data-msg="打开话题：期末复习搭子招募">
+              <div class="rank-no">1</div>
+              <div class="rank-body"><b>期末复习搭子招募，图书馆四楼集合</b><small>学习搭子 · 386 人参与</small></div>
+              <div class="heat">🔥 9.8w</div>
+            </div>
+            <div class="rank-item" data-action="toast" data-msg="打开话题：三食堂新窗口">
+              <div class="rank-no">2</div>
+              <div class="rank-body"><b>三食堂新开的砂锅窗口到底值不值</b><small>食堂测评 · 214 人参与</small></div>
+              <div class="heat">🔥 7.2w</div>
+            </div>
+            <div class="rank-item" data-action="toast" data-msg="打开话题：校园歌手大赛">
+              <div class="rank-no">3</div>
+              <div class="rank-body"><b>校园歌手大赛决赛名单出炉</b><small>校园活动 · 168 人参与</small></div>
+              <div class="heat">🔥 5.6w</div>
+            </div>
+            <div class="rank-item" data-action="toast" data-msg="打开话题：二手自行车">
+              <div class="rank-no">4</div>
+              <div class="rank-body"><b>毕业季二手自行车 200 出</b><small>二手闲置 · 96 人参与</small></div>
+              <div class="heat">🔥 3.1w</div>
+            </div>
+            <div class="rank-item" data-action="toast" data-msg="打开话题：图书馆占座">
+              <div class="rank-no">5</div>
+              <div class="rank-body"><b>图书馆占座现象，你怎么看？</b><small>校园话题 · 88 人参与</small></div>
+              <div class="heat">🔥 2.4w</div>
+            </div>
+          </div>
+
+          <div class="section-title">
+            <h3>🎪 本周活动</h3>
+            <a>全部 ›</a>
+          </div>
+          <div class="event">
+            <div class="cover">🎤</div>
+            <div style="flex:1">
+              <b>草坪音乐节 · 夏夜限定</b>
+              <small>周五 19:00 · 中心草坪<br/>已有 328 人报名</small>
+            </div>
+            <button class="go" data-action="toast" data-msg="已报名，记得提前 15 分钟入场">报名</button>
+          </div>
+          <div class="event" style="background:linear-gradient(120deg,#2A2140,#4B2F63);margin-top:10px">
+            <div class="cover" style="background:linear-gradient(140deg,#FF8A5B,#FF5C8A)">🧺</div>
+            <div style="flex:1">
+              <b>毕业季跳蚤市场</b>
+              <small>周六 09:00 · 南门广场<br/>摊位剩余 24 个</small>
+            </div>
+            <button class="go" data-action="toast" data-msg="摊位申请已提交，等待审核">摆摊</button>
+          </div>
+          <div style="height:14px"></div>
+        </section>
+
+        <!-- ============ 消息 ============ -->
+        <section class="page" data-page="messages">
+          <div class="topbar">
+            <div class="topbar-row" style="justify-content:space-between">
+              <h1 class="app-title">消息</h1>
+              <button class="icon-btn" data-action="toast" data-msg="已全部标记为已读">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="notice">
+            <button data-action="toast" data-msg="赞与收藏：12 条新互动">
+              <div class="ni">❤️</div><span>赞与收藏</span><i class="dot-badge">12</i>
+            </button>
+            <button data-action="toast" data-msg="新增关注：3 位同学">
+              <div class="ni">👥</div><span>新增关注</span><i class="dot-badge">3</i>
+            </button>
+            <button data-action="toast" data-msg="系统通知：你申请的摊位已通过">
+              <div class="ni">📢</div><span>系统通知</span><i class="dot-badge">1</i>
+            </button>
+          </div>
+
+          <div class="section-title" style="margin-top:14px"><h3>私信</h3><a>全部已读</a></div>
+          <div class="card" style="margin:0 14px;padding:4px 0">
+            <div class="chat" data-action="toast" data-msg="打开与 林知夏 的对话">
+              <div class="avatar" style="--a:#FFB199;--b:#FF6B6B">林</div>
+              <div class="who" style="flex:1;min-width:0">
+                <b>林知夏</b>
+                <p>明天图书馆四楼，我占了靠窗的位置～</p>
+              </div>
+              <div class="time">10:24</div>
+              <div class="unread">2</div>
+            </div>
+            <div class="chat" data-action="toast" data-msg="打开与 陈默 的对话">
+              <div class="avatar" style="--a:#A0D8FF;--b:#4B9BFF">陈</div>
+              <div class="who" style="flex:1;min-width:0">
+                <b>陈默</b>
+                <p>自行车还在吗？我下午可以过来看</p>
+              </div>
+              <div class="time">09:56</div>
+              <div class="unread">1</div>
+            </div>
+            <div class="chat" data-action="toast" data-msg="打开 摄影社 群聊">
+              <div class="avatar" style="--a:#C4B5FD;--b:#8B5CF6">摄</div>
+              <div class="who" style="flex:1;min-width:0">
+                <b>摄影社 · 群聊</b>
+                <p>周六外拍报名接龙，还差 3 人</p>
+              </div>
+              <div class="time">昨天</div>
+            </div>
+            <div class="chat" data-action="toast" data-msg="打开与 苏晚 的对话">
+              <div class="avatar" style="--a:#FFD3A5;--b:#FD9D5B">苏</div>
+              <div class="who" style="flex:1;min-width:0">
+                <b>苏晚</b>
+                <p>笔记我整理好了，回头发你</p>
+              </div>
+              <div class="time">周二</div>
+            </div>
+            <div class="chat" data-action="toast" data-msg="打开 失物招领 助手">
+              <div class="avatar" style="--a:#86EFAC;--b:#22C55E">拾</div>
+              <div class="who" style="flex:1;min-width:0">
+                <b>失物招领助手</b>
+                <p>你发布的「黑色雨伞」有 1 条匹配消息</p>
+              </div>
+              <div class="time">周一</div>
+            </div>
+          </div>
+          <div style="height:16px"></div>
+        </section>
+
+        <!-- ============ 我的 ============ -->
+        <section class="page" data-page="me">
+          <div class="profile-cover"></div>
+          <div class="profile-card">
+            <button class="p-edit" data-action="toast" data-msg="编辑资料">编辑资料</button>
+            <div class="p-avatar" id="myAvatar">同</div>
+            <div class="p-name" id="myName">同窗用户 <span class="badge gold">校园认证</span></div>
+            <p class="p-bio">计算机学院 · 大三 ｜ 喜欢摄影和夜跑<br/>在做一个记录校园日落的项目 🌇</p>
+            <div class="p-stats">
+              <div><b id="statPosts">6</b><small>动态</small></div>
+              <div><b>128</b><small>关注</small></div>
+              <div><b>342</b><small>粉丝</small></div>
+              <div><b id="statLikes">1.8k</b><small>获赞</small></div>
+            </div>
+          </div>
+
+          <div class="menu">
+            <div class="menu-row" data-action="toast" data-msg="我的收藏 · 共 18 条"><div class="mi">🔖</div><span>我的收藏</span><div class="arrow">›</div></div>
+            <div class="menu-row" data-action="toast" data-msg="我的发布 · 共 6 条"><div class="mi">📝</div><span>我的发布</span><div class="arrow">›</div></div>
+            <div class="menu-row" data-action="toast" data-msg="二手交易 · 1 件在售"><div class="mi">🛍️</div><span>我的二手交易</span><div class="arrow">›</div></div>
+            <div class="menu-row" data-action="toast" data-msg="学习搭子 · 正在进行 2 个"><div class="mi">🤝</div><span>我的学习搭子</span><div class="arrow">›</div></div>
+          </div>
+
+          <div class="menu">
+            <div class="menu-row" data-action="toast" data-msg="实名认证：已通过"><div class="mi">🛡️</div><span>校园身份认证</span><div class="arrow">›</div></div>
+            <div class="menu-row" data-action="toast" data-msg="隐私设置"><div class="mi">🔒</div><span>隐私与安全</span><div class="arrow">›</div></div>
+            <div class="menu-row" data-action="toast" data-msg="通知设置"><div class="mi">🔔</div><span>通知设置</span><div class="arrow">›</div></div>
+            <div class="menu-row" data-action="toast" data-msg="关于同窗 v1.0.0"><div class="mi">ℹ️</div><span>关于同窗</span><div class="arrow">›</div></div>
+          </div>
+          <div style="text-align:center;font-size:11.5px;color:#BFC6D2;padding:20px 0 8px">同窗 v1.0.0 · 校园社区原型</div>
+        </section>
+      </main>
+
+      <!-- 底部导航 -->
+      <nav class="tabbar">
+        <button class="tab on" data-tab="home">
+          <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.8V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.8"/></svg>
+          <span>首页</span>
+        </button>
+        <button class="tab" data-tab="discover">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.6 8.4 13.8 13.8 8.4 15.6l1.8-5.4Z"/></svg>
+          <span>发现</span>
+        </button>
+        <button class="tab tab-mid" data-action="openPub">
+          <div class="plus">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+        </button>
+        <button class="tab" data-tab="messages">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.2 9.2 0 0 1-3.4-.7L3 21l1.8-4.6A8.4 8.4 0 0 1 12 3.2a8.4 8.4 0 0 1 9 8.3Z"/></svg>
+          <span>消息</span>
+        </button>
+        <button class="tab" data-tab="me">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg>
+          <span>我的</span>
+        </button>
+      </nav>
+
+      <!-- 发布浮层 -->
+      <div class="overlay" id="pubOverlay">
+        <div class="sheet">
+          <div class="grabber"></div>
+          <div class="sheet-head">
+            <button data-action="closePub">取消</button>
+            <h3>发布动态</h3>
+            <button class="pub-btn" id="pubBtn" disabled data-action="publish">发布</button>
+          </div>
+          <textarea id="pubText" placeholder="分享此刻的校园生活…"></textarea>
+          <div class="img-slots" id="imgSlots">
+            <button class="slot" data-action="addImg">＋</button>
+          </div>
+          <div class="pub-tools">
+            <button data-action="topicPick" data-topic="校园日常"># 话题</button>
+            <button data-action="toast" data-msg="定位：明德楼">📍 所在位置</button>
+            <button data-action="toast" data-msg="谁可以看：全校可见">👀 可见范围</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:11.5px;color:#AEB6C4">
+            <span>友善发言，共建校园氛围</span>
+            <span id="charCount">0/300</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 评论浮层 -->
+      <div class="overlay" id="cmtOverlay">
+        <div class="sheet">
+          <div class="grabber"></div>
+          <div class="sheet-head">
+            <h3 id="cmtTitle">评论</h3>
+            <button data-action="closeCmt">关闭</button>
+          </div>
+          <div class="cmt" id="cmtList"></div>
+          <div class="cmt-input">
+            <input id="cmtInput" placeholder="说点什么…" />
+            <button class="cmt-send" data-action="sendCmt">发送</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- 数据 ---------------- */
+  const SEED = [
+    {
+      id:"p1", name:"林知夏", college:"新闻学院 · 大二", time:"12 分钟前",
+      a:"#FFB199", b:"#FF6B6B", tag:"考研搭子",
+      text:"图书馆四楼靠窗的位置我已经占好啦，早上八点到晚上十点，全程静音自习。一个人复习总是走神，想找个搭子互相监督，<span class='hl'>目标：英语 75+</span>。有一起的吗？",
+      imgs:[{e:"📚",c1:"#CBD5FF",c2:"#8FA6FF"},{e:"☕",c1:"#FFE1C4",c2:"#FFB37A"}],
+      likes:186, liked:false, saved:false, following:false,
+      comments:[
+        {name:"陈默", text:"我也在四楼，明天早上一起？", time:"8 分钟前", a:"#A0D8FF", b:"#4B9BFF"},
+        {name:"苏晚", text:"英语我有一套真题整理，回头发你", time:"5 分钟前", a:"#FFD3A5", b:"#FD9D5B"}
+      ]
+    },
+    {
+      id:"p2", name:"陈默", college:"机械工程学院 · 大三", time:"38 分钟前",
+      a:"#A0D8FF", b:"#4B9BFF", tag:"食堂测评",
+      text:"三食堂新开的砂锅窗口，12 块一份，牛肉给得挺足，汤头是那种熬出来的浓。缺点是排队要 20 分钟，建议错峰。评分：<span class='hl'>8.5 / 10</span>",
+      imgs:[{e:"🍜",c1:"#FFD9B0",c2:"#FF9A5B"},{e:"🥘",c1:"#FFC7C7",c2:"#FF7B7B"},{e:"🥢",c1:"#D8E5FF",c2:"#9FB8FF"},{e:"🧋",c1:"#D9F5E3",c2:"#8FD9B0"}],
+      likes:342, liked:false, saved:false, following:false,
+      comments:[
+        {name:"林知夏", text:"昨天去了，牛杂的更香！", time:"20 分钟前", a:"#FFB199", b:"#FF6B6B"}
+      ]
+    },
+    {
+      id:"p3", name:"苏晚", college:"外国语学院 · 大四", time:"2 小时前",
+      a:"#FFD3A5", b:"#FD9D5B", tag:"二手闲置",
+      text:"毕业清宿舍，出一台用了两年的自行车，链条刚上过油，刹车灵敏。原价 680，现在 <span class='hl'>200 出</span>，南门自提，可以先来看车。",
+      imgs:[{e:"🚲",c1:"#D6E8FF",c2:"#7FA8E8"}],
+      likes:96, liked:false, saved:false, following:false,
+      comments:[
+        {name:"陈默", text:"还在吗？我下午可以过来看", time:"1 小时前", a:"#A0D8FF", b:"#4B9BFF"},
+        {name:"周野", text:"可以留到明天吗", time:"40 分钟前", a:"#C7F0D8", b:"#63C98C"}
+      ]
+    },
+    {
+      id:"p4", name:"周野", college:"体育学院 · 大二", time:"今天 09:20",
+      a:"#C7F0D8", b:"#63C98C", tag:"组队运动",
+      text:"今晚 8 点东区篮球场，三缺一，来两个能跑的。水平一般也行，主要图个出汗，打完一起去吃夜宵。",
+      imgs:[],
+      likes:54, liked:false, saved:false, following:true,
+      comments:[
+        {name:"苏晚", text:"我来！但我只会投三分", time:"3 小时前", a:"#FFD3A5", b:"#FD9D5B"}
+      ]
+    },
+    {
+      id:"p5", name:"摄影社", college:"校级社团 · 认证账号", time:"今天 08:05",
+      a:"#C4B5FD", b:"#8B5CF6", tag:"社团招新",
+      text:"【秋季招新】我们是摄影社，每周一次外拍，免费提供相机借用和后期教学。不需要作品集，<span class='hl'>带着好奇心就够了</span>。本周六下午在艺术楼 302 面谈。",
+      imgs:[{e:"📷",c1:"#DCD6FF",c2:"#A78BFA"},{e:"🌇",c1:"#FFD5C2",c2:"#FF8A65"},{e:"🎞️",c1:"#C9E4E8",c2:"#7FB8C4"}],
+      likes:271, liked:false, saved:true, following:true,
+      comments:[
+        {name:"林知夏", text:"大一可以报吗？", time:"5 小时前", a:"#FFB199", b:"#FF6B6B"},
+        {name:"摄影社", text:"当然可以，欢迎！", time:"4 小时前", a:"#C4B5FD", b:"#8B5CF6"}
+      ]
+    },
+    {
+      id:"p6", name:"许以安", college:"建筑学院 · 研一", time:"昨天 22:14",
+      a:"#FFC48A", b:"#FF8A5B", tag:"校园日常",
+      text:"在图书馆五楼画图到闭馆，出门看到晚霞把整栋楼染成橙色。突然觉得，赶图也没那么难熬。",
+      imgs:[{e:"🌇",c1:"#FFD1A6",c2:"#FF8F6B"},{e:"🏛️",c1:"#D9DFFF",c2:"#9AA9E8"}],
+      likes:512, liked:false, saved:false, following:false,
+      comments:[]
+    }
+  ];
+
+  const STORE_KEY = "tongchuang.v1";
+  let state = {
+    posts: JSON.parse(JSON.stringify(SEED)),
+    tab: "home",
+    feed: "reco",
+    topic: "全部",
+    query: "",
+    cmtPostId: null,
+    draftImgs: 0
+  };
+
+  /* 本地恢复 */
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw){
+      const saved = JSON.parse(raw);
+      if(saved && Array.isArray(saved.posts) && saved.posts.length){
+        state.posts = saved.posts;
+      }
+    }
+  }catch(e){}
+
+  function persist(){
+    try{
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        posts: state.posts.map(p => ({
+          id:p.id, name:p.name, college:p.college, time:p.time, a:p.a, b:p.b, tag:p.tag,
+          text:p.text, imgs:p.imgs, likes:p.likes, liked:p.liked, saved:p.saved,
+          following:p.following, comments:p.comments
+        }))
+      }));
+    }catch(e){}
+  }
+
+  /* ---------------- 工具 ---------------- */
+  const $  = (s, r) => (r||document).querySelector(s);
+  const $$ = (s, r) => Array.from((r||document).querySelectorAll(s));
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const fmt = n => n >= 10000 ? (n/10000).toFixed(1).replace(".0","") + "w" : (n >= 1000 ? (n/1000).toFixed(1).replace(".0","") + "k" : String(n));
+
+  let toastTimer = null;
+  function toast(msg){
+    const el = $("#toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("show"), 1900);
+  }
+
+  /* ---------------- 渲染信息流 ---------------- */
+  function mediaHTML(imgs){
+    if(!imgs || !imgs.length) return "";
+    const n = imgs.length;
+    const cls = n === 1 ? "one" : (n === 2 ? "two" : "four");
+    const show = n > 4 ? imgs.slice(0,4) : imgs;
+    const items = show.map((im, i) => {
+      const more = (n > 4 && i === 3) ? ` more` : "";
+      const attr = (n > 4 && i === 3) ? ` data-more="+${n-3}"` : "";
+      return `<div class="ph${more}"${attr} style="--c1:${im.c1};--c2:${im.c2}"><span>${im.e}</span></div>`;
+    }).join("");
+    return `<div class="media ${cls}">${items}</div>`;
+  }
+
+  function postHTML(p){
+    return `
+    <article class="card post" data-post="${p.id}">
+      <div class="post-head">
+        <div class="avatar" style="--a:${p.a};--b:${p.b}">${esc(p.name.slice(0,1))}</div>
+        <div class="who">
+          <div class="name">${esc(p.name)} <span class="badge">${p.college.includes("认证") ? "官方" : esc(p.college.split("·")[1] || "同学")}</span></div>
+          <div class="meta">${esc(p.college)} · ${esc(p.time)}</div>
+        </div>
+        <button class="follow-btn ${p.following ? "done" : ""}" data-action="follow" data-id="${p.id}">${p.following ? "已关注" : "+ 关注"}</button>
+      </div>
+      <p class="post-text">${p.text}</p>
+      <div class="topic"># ${esc(p.tag)}</div>
+      ${mediaHTML(p.imgs)}
+      <div class="post-actions">
+        <button class="act ${p.liked ? "liked" : ""}" data-action="like" data-id="${p.id}">
+          <svg viewBox="0 0 24 24"><path d="M12 20.3 4.6 12.9a4.6 4.6 0 0 1 0-6.5 4.6 4.6 0 0 1 6.5 0l.9.9.9-.9a4.6 4.6 0 0 1 6.5 0 4.6 4.6 0 0 1 0 6.5Z"/></svg>
+          ${p.likes > 0 ? fmt(p.likes) : "赞"}
+        </button>
+        <button class="act" data-action="comment" data-id="${p.id}">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.2 9.2 0 0 1-3.4-.7L3 21l1.8-4.6A8.4 8.4 0 0 1 12 3.2a8.4 8.4 0 0 1 9 8.3Z"/></svg>
+          ${p.comments.length || "评论"}
+        </button>
+        <button class="act ${p.saved ? "saved" : ""}" data-action="save" data-id="${p.id}">
+          <svg viewBox="0 0 24 24"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1Z"/></svg>
+          ${p.saved ? "已收藏" : "收藏"}
+        </button>
+        <button class="act" data-action="share" data-id="${p.id}">
+          <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.4 10.8 15.6 6.3M8.4 13.2l7.2 4.5"/></svg>
+          分享
+        </button>
+      </div>
+    </article>`;
+  }
+
+  function visiblePosts(){
+    let list = state.posts.slice();
+    if(state.feed === "follow") list = list.filter(p => p.following);
+    if(state.topic !== "全部") list = list.filter(p => p.tag === state.topic || p.text.indexOf(state.topic) > -1);
+    if(state.query) {
+      const q = state.query.toLowerCase();
+      list = list.filter(p =>
+        (p.text + p.name + p.tag + p.college).toLowerCase().indexOf(q) > -1
+      );
+    }
+    return list;
+  }
+
+  function renderFeed(){
+    const box = $("#feedList");
+    const list = visiblePosts();
+    if(!list.length){
+      box.innerHTML = `<div class="empty"><div class="e">🌱</div><p>${state.feed === "follow" ? "还没有关注的动态<br/>去首页关注几位同学吧" : "没有找到相关内容<br/>换个关键词试试"}</p></div>`;
+      return;
+    }
+    box.innerHTML = list.map(postHTML).join("");
+  }
+
+  /* ---------------- 页面切换 ---------------- */
+  function switchTab(tab){
+    state.tab = tab;
+    $$(".page").forEach(p => p.classList.toggle("active", p.dataset.page === tab));
+    $$(".tab[data-tab]").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+    $("#scroll").scrollTop = 0;
+  }
+
+  /* ---------------- 发布 ---------------- */
+  function openPub(){
+    $("#pubOverlay").classList.add("show");
+    setTimeout(() => $("#pubText").focus(), 260);
+  }
+  function closePub(){
+    $("#pubOverlay").classList.remove("show");
+    $("#pubText").blur();
+  }
+  function publish(){
+    const text = $("#pubText").value.trim();
+    if(!text){ toast("写点什么再发布吧"); return; }
+    const emojis = ["✨","🌿","📸","🎧","🍃"];
+    const imgs = [];
+    for(let i = 0; i < state.draftImgs; i++){
+      imgs.push({ e: emojis[i % emojis.length], c1:"#CFDCFF", c2:"#93AAFF" });
+    }
+    state.posts.unshift({
+      id: "me-" + Date.now(),
+      name: "同窗用户", college:"计算机学院 · 大三", time:"刚刚",
+      a:"#FFC48A", b:"#FF8A5B", tag:"校园日常",
+      text: esc(text).replace(/\n/g, "<br/>"),
+      imgs: imgs, likes:0, liked:false, saved:false, following:false, comments:[]
+    });
+    persist();
+    $("#pubText").value = "";
+    state.draftImgs = 0;
+    renderPubSlots();
+    updatePubBtn();
+    closePub();
+    state.feed = "reco"; state.topic = "全部"; state.query = "";
+    $("#searchInput").value = "";
+    $$(".seg button").forEach(b => b.classList.toggle("on", b.dataset.feed === "reco"));
+    $$("#chips .chip").forEach(c => c.classList.toggle("on", c.dataset.topic === "全部"));
+    switchTab("home");
+    renderFeed();
+    updateStats();
+    toast("发布成功，已出现在信息流顶部");
+  }
+  function renderPubSlots(){
+    const box = $("#imgSlots");
+    let html = "";
+    for(let i = 0; i < state.draftImgs; i++){
+      const e = ["✨","🌿","📸"][i] || "✨";
+      html += `<button class="slot filled" data-action="rmImg" data-i="${i}">${e}</button>`;
+    }
+    if(state.draftImgs < 3) html += `<button class="slot" data-action="addImg">＋</button>`;
+    box.innerHTML = html;
+  }
+  function updatePubBtn(){
+    $("#pubBtn").disabled = $("#pubText").value.trim().length === 0;
+  }
+
+  /* ---------------- 评论 ---------------- */
+  function openCmt(id){
+    const p = state.posts.find(x => x.id === id);
+    if(!p) return;
+    state.cmtPostId = id;
+    $("#cmtTitle").textContent = `评论 · ${p.comments.length}`;
+    renderCmt();
+    $("#cmtOverlay").classList.add("show");
+  }
+  function renderCmt(){
+    const p = state.posts.find(x => x.id === state.cmtPostId);
+    if(!p) return;
+    const box = $("#cmtList");
+    if(!p.comments.length){
+      box.innerHTML = `<div class="empty" style="padding:34px 0"><div class="e">💬</div><p>还没有评论，来抢沙发</p></div>`;
+      return;
+    }
+    box.innerHTML = p.comments.map(c => `
+      <div class="cmt-item">
+        <div class="avatar sm" style="--a:${c.a || "#CBD5FF"};--b:${c.b || "#8FA6FF"}">${esc(c.name.slice(0,1))}</div>
+        <div class="who">
+          <b>${esc(c.name)}</b>
+          <p>${esc(c.text)}</p>
+          <small>${esc(c.time || "刚刚")}</small>
+        </div>
+      </div>`).join("");
+    $("#cmtTitle").textContent = `评论 · ${p.comments.length}`;
+  }
+  function sendCmt(){
+    const input = $("#cmtInput");
+    const val = input.value.trim();
+    if(!val){ toast("说点什么吧"); return; }
+    const p = state.posts.find(x => x.id === state.cmtPostId);
+    if(!p) return;
+    p.comments.push({ name:"同窗用户", text: val, time:"刚刚", a:"#FFC48A", b:"#FF8A5B" });
+    input.value = "";
+    persist();
+    renderCmt();
+    renderFeed();
+    const box = $("#cmtList");
+    box.scrollTop = box.scrollHeight;
+    toast("评论已发布");
+  }
+
+  /* ---------------- 统计 ---------------- */
+  function updateStats(){
+    const mine = state.posts.filter(p => p.name === "同窗用户").length;
+    const likes = state.posts.reduce((s,p) => s + p.likes, 0);
+    $("#statPosts").textContent = String(6 + mine);
+    $("#statLikes").textContent = likes >= 1000 ? (likes/1000).toFixed(1) + "k" : String(likes);
+    const saved = state.posts.filter(p => p.saved).length;
+    const el = $("#myName");
+    if(mine > 0 && el && !el.dataset.done){
+      el.dataset.done = "1";
+    }
+  }
+
+  /* ---------------- 事件 ---------------- */
+  document.addEventListener("click", function(ev){
+    const tabBtn = ev.target.closest("[data-tab]");
+    if(tabBtn){
+      switchTab(tabBtn.dataset.tab);
+      return;
+    }
+
+    const el = ev.target.closest("[data-action]");
+    if(!el) return;
+    const action = el.dataset.action;
+
+    if(action === "toast"){
+      toast(el.dataset.msg || "功能开发中");
+      return;
+    }
+
+    if(action === "openPub"){ openPub(); return; }
+    if(action === "closePub"){ closePub(); return; }
+    if(action === "publish"){ publish(); return; }
+
+    if(action === "addImg"){
+      if(state.draftImgs >= 3){ toast("最多添加 3 张图片"); return; }
+      state.draftImgs++;
+      renderPubSlots();
+      return;
+    }
+    if(action === "rmImg"){
+      state.draftImgs = Math.max(0, state.draftImgs - 1);
+      renderPubSlots();
+      return;
+    }
+    if(action === "topicPick"){
+      const t = el.dataset.topic;
+      const ta = $("#pubText");
+      if(ta.value.indexOf("#" + t) === -1) ta.value = (ta.value.trim() ? ta.value.trim() + " " : "") + "#" + t + " ";
+      updatePubBtn();
+      toast("已添加话题 #" + t);
+      return;
+    }
+
+    const id = el.dataset.id;
+    const post = state.posts.find(p => p.id === id);
+
+    if(action === "like" && post){
+      post.liked = !post.liked;
+      post.likes += post.liked ? 1 : -1;
+      persist();
+      el.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 20.3 4.6 12.9a4.6 4.6 0 0 1 0-6.5 4.6 4.6 0 0 1 6.5 0l.9.9.9-.9a4.6 4.6 0 0 1 6.5 0 4.6 4.6 0 0 1 0 6.5Z"/></svg>${fmt(post.likes)}`;
+      el.classList.toggle("liked", post.liked);
+      updateStats();
+      return;
+    }
+    if(action === "save" && post){
+      post.saved = !post.saved;
+      persist();
+      el.innerHTML = `<svg viewBox="0 0 24 24"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1Z"/></svg>${post.saved ? "已收藏" : "收藏"}`;
+      el.classList.toggle("saved", post.saved);
+      toast(post.saved ? "已加入收藏" : "已取消收藏");
+      updateStats();
+      return;
+    }
+    if(action === "comment" && post){ openCmt(id); return; }
+    if(action === "closeCmt"){ $("#cmtOverlay").classList.remove("show"); return; }
+    if(action === "sendCmt"){ sendCmt(); return; }
+    if(action === "share"){
+      toast("链接已复制，去分享给同学吧");
+      return;
+    }
+    if(action === "follow" && post){
+      post.following = !post.following;
+      persist();
+      el.classList.toggle("done", post.following);
+      el.textContent = post.following ? "已关注" : "+ 关注";
+      toast(post.following ? "已关注 " + post.name : "已取消关注");
+      if(state.feed === "follow") renderFeed();
+      return;
+    }
+  });
+
+  /* 分段 */
+  $$(".seg button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.feed = btn.dataset.feed;
+      $$(".seg button").forEach(b => b.classList.toggle("on", b === btn));
+      renderFeed();
+    });
+  });
+
+  /* 话题 */
+  $("#chips").addEventListener("click", ev => {
+    const chip = ev.target.closest(".chip");
+    if(!chip) return;
+    state.topic = chip.dataset.topic;
+    $$("#chips .chip").forEach(c => c.classList.toggle("on", c === chip));
+    renderFeed();
+    $("#scroll").scrollTo({ top: 240, behavior:"smooth" });
+  });
+
+  /* 搜索 */
+  $("#searchInput").addEventListener("input", ev => {
+    state.query = ev.target.value.trim();
+    state.tab = "home";
+    switchTab("home");
+    renderFeed();
+  });
+
+  /* 发布输入 */
+  $("#pubText").addEventListener("input", ev => {
+    updatePubBtn();
+    const n = ev.target.value.length;
+    $("#charCount").textContent = n + "/300";
+    if(n > 300){ ev.target.value = ev.target.value.slice(0,300); $("#charCount").textContent = "300/300"; }
+  });
+
+  /* 遮罩关闭 */
+  $("#pubOverlay").addEventListener("click", ev => { if(ev.target.id === "pubOverlay") closePub(); });
+  $("#cmtOverlay").addEventListener("click", ev => { if(ev.target.id === "cmtOverlay") $("#cmtOverlay").classList.remove("show"); });
+
+  /* 回车发送评论 */
+  $("#cmtInput").addEventListener("keydown", ev => {
+    if(ev.key === "Enter"){ ev.preventDefault(); sendCmt(); }
+  });
+
+  /* 时钟 */
+  function tick(){
+    const d = new Date();
+    $("#clock").textContent = d.getHours() + ":" + String(d.getMinutes()).padStart(2,"0");
+  }
+  tick(); setInterval(tick, 20000);
+
+  /* 初始化 */
+  const initialTab = new URLSearchParams(location.search).get("tab");
+  if(initialTab && ["home","discover","messages","me"].indexOf(initialTab) > -1) switchTab(initialTab);
+  renderFeed();
+  updateStats();
+  renderPubSlots();
+})();
+</script>
+</body>
+</html>
